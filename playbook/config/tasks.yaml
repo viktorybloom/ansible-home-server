@@ -1,0 +1,9 @@
+# tasks.yaml
+---
+
+# Add user to Docker group - no sudo required
+- name: Add User to Docker Group
+  user:
+    name: "{{ ansible_ssh_user }}"
+    groups: docker
+    append: yes

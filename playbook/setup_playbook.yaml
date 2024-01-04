@@ -1,0 +1,17 @@
+# setup_playbook.yml
+---
+- name: Raspberry Pi Setup
+  hosts: 192.168.1.101
+  become: true
+
+  tasks:
+    - include_tasks: ./config/initial_setup.yaml
+    - include_tasks: ./config/packages.yaml
+    - include_tasks: ./config/tasks.yml
+
+    - name: Reboot
+      command: sudo reboot
+      async: 0
+      poll: 0
+      become: false
+

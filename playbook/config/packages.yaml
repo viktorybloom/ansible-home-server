@@ -1,0 +1,13 @@
+# packages.yaml
+---
+initial_packages:
+  - vim
+  - tmux
+  - tree
+  - curl
+  - wget
+  - git
+  - unzip
+  - docker
+  - docker.io
+  - docker-compose
