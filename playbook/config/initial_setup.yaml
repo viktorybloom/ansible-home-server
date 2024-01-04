@@ -5,21 +5,15 @@
     update_cache: yes
     upgrade: dist
 
-- name: Install Raspberry Pi Kernel
-  apt:
-    name: raspberrypi-kernel
-    state: present
-
 - name: Install Initial Packages
   apt:
     name: "{{ item }}"
     state: present
-  loop: "{{ initial_packages }}"
+  loop: "{{ packages }}"
 
 - name: Clean Up
   apt:
     autoclean: yes
-    clean: yes
     autoremove: yes
 
 
