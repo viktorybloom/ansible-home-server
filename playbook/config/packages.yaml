@@ -1,7 +1,7 @@
 # packages.yaml
 ---
 packages:
-  - vim
+  - neovim
   - tmux
   - tree
   - curl
@@ -10,3 +10,4 @@ packages:
   - unzip
   - docker.io
   - docker-compose
+  - openvswitch-switch

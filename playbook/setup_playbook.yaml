@@ -9,6 +9,14 @@
         file: ./config/packages.yaml
     - include_tasks: ./config/initial_setup.yaml
     - include_tasks: ./config/tasks.yaml
+     
+    - name: Obtain eth0 ip address
+      shell: "ip addr show eth0 | grep -oP '(?<=inet\\s)\\d+(\\.\\d+){3}'"
+      register: eth0_ip_result
+
+    - name: Display eth0 IP address
+      debug:
+        var: eth0_ip_result.stdout_lines
 
     - name: Reboot
       command: sudo reboot
