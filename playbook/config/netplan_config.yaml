@@ -13,11 +13,4 @@ network:
         nameservers:
           addresses: [127.0.0.1] # Required for docker pihole dns service
         optional: true
-    wifis:
-        renderer: networkd
-        wlan0:
-            access-points:
-                WiFi-8295:
-                    password: 39ec212457fddff7e841353383d3b8ae966cc6b038d80712b624648f4cf56fb3
-            dhcp4: true
-            optional: true
+

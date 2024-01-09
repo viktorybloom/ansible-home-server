@@ -1,26 +1,41 @@
 #!/bin/bash
 
 # Variables
-ubuntu_server_image="/path/to/ubuntu-server-image.img"
-sd_card_device="/dev/sdX"
-local_machine_ip="localhost"
-rpi_ip="<your-rpi-ip>"
-static_ip="<your-static-ip>"
-gateway_ip="<your-gateway-ip>"
-dns_ip="<your-dns-ip>"
+os_image="./os-images/ubuntu-23.10-preinstalled-server-arm64+raspi.img.xz"
+sd_card_device="/dev/sdc"
+vault_file="./vault/secret.txt"
+rpi_password=$(echo "$(cat $vault_file)" | mkpasswd -m sha-512 -s)
+rpi_hostname="rpi4b"
 
-# Make SD Card Bootable with Ubuntu Server ISO
-sudo dd bs=4M if=$ubuntu_server_image of=$sd_card_device conv=fsync status=progress
+# Make SD Card Bootable with os ISO
+sudo dd bs=4M if="${os_image%.xz}" of=$sd_card_device conv=fsync status=progress
 
-# Edit Netplan to Connect to Router via Eth0
+# Mount the boot partition
 sudo mount $sd_card_device"1" /mnt   # Assuming boot partition is the first partition
-echo -e "version: 2\nethernets:\n  eth0:\n    addresses: [$static_ip/24]\n    gateway4: $gateway_ip\n    nameservers:\n      addresses: [$dns_ip]" | sudo tee /mnt/network-config
-sudo umount /mnt
 
-# Script to Allow SSH Fingerprint with Local Machine and IP
-echo -e "#!/bin/bash\n\n# Add local machine SSH fingerprint\nssh-keyscan -H $local_machine_ip >> ~/.ssh/known_hosts\n\n# Add Raspberry Pi's IP address\nssh-keyscan -H $rpi_ip >> ~/.ssh/known_hosts" > setup_ssh.sh
-chmod +x setup_ssh.sh
-./setup_ssh.sh
+# Enable SSH on Raspberry Pi
+sudo touch /mnt/ssh
 
-echo "Setup completed successfully."
-
+# Edit user-data to setup initial credentials
+echo -e "#cloud-config\n\n\
+hostname: $rpi_hostname\n\
+manage_etc_hosts: true\n\
+packages:\n\
+  - avahi-daemon\n\
+apt:\n\
+  conf: |\n\
+    Acquire {\n\
+      Check-Date \"false\";\n\
+    };\n\n\
+users:\n\
+  - name: $rpi_hostname\n\
+    groups: users,adm,dialout,audio,netdev,video,plugdev,cdrom,games,input,gpio,spi,i2c,render,sudo\n\
+    shell: /bin/bash\n\
+    lock_passwd: false\n\
+    passwd: $rpi_password\n\n\
+ssh_pwauth: true\n\
+timezone: Australia/Brisbane\n\
+runcmd:\n\
+  - sed -i 's/^s*REGDOMAIN=S*/REGDOMAIN=AU/' /etc/default/crda || true\n\
+  - localectl set-x11-keymap \"us\" pc105\n\
+  - setupcon -k --force || true" | sudo tee /mnt/user-data
