@@ -12,3 +12,4 @@ packages:
   - docker-compose
   - openvswitch-switch
   - resolvconf
+  - linux-modules-extra-raspi
