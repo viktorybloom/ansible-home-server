@@ -1,6 +1,7 @@
 # Ignore vault and backups and subdirectories
 vault/
 backups/
+os-images/
 *~
 
 # Ignore swap files
