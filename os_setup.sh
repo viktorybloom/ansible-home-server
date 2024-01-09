@@ -2,7 +2,7 @@
 
 # Variables
 os_image="./os-images/ubuntu-23.10-preinstalled-server-arm64+raspi.img.xz"
-sd_card_device="/dev/sdc"
+sd_card_device=$(ls /dev/sd* | grep -E "/dev/sd[b-z]" | head -n 1) # from b-z since sata takes sd'a'
 vault_file="./vault/secret.txt"
 rpi_password=$(echo "$(cat $vault_file)" | mkpasswd -m sha-512 -s)
 rpi_hostname="rpi4b"

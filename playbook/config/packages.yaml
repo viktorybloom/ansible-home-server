@@ -11,3 +11,4 @@ packages:
   - docker.io
   - docker-compose
   - openvswitch-switch
+  - resolvconf
