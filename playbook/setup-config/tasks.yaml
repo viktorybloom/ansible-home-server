@@ -1,0 +1,32 @@
+# tasks.yaml
+---
+
+# Docker without sudo requirement
+- name: Add User to Docker Group
+  user:
+    name: "{{ ansible_ssh_user }}"
+    groups: docker
+    append: yes
+
+- name: Edit Netplan file to update eth0 access
+  block: 
+    - name: Find netplan file in /etc/netplan directory
+      find:
+        paths: "/etc/netplan"
+        patterns: "*.yaml"
+      register: netplan_file
+
+    - name: Display found netplan file
+      debug:
+        var: netplan_file.files.0.path
+
+    - name: Add configuration to Netplan file
+      template: 
+        src: "netplan_config.yaml"
+        dest: "{{ netplan_file.files.0.path }}"
+      when: netplan_file.matched > 0 
+
+- name: Apply netplan changes
+  command: sudo netplan apply
+
+

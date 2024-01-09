@@ -1,0 +1,15 @@
+# packages.yaml
+---
+packages:
+  - neovim
+  - tmux
+  - tree
+  - curl
+  - wget
+  - git
+  - unzip
+  - docker.io
+  - docker-compose
+  - openvswitch-switch
+  - resolvconf
+  - linux-modules-extra-raspi

@@ -1,0 +1,19 @@
+# initial_setup.yaml
+---
+- name: Initial Setup - Update and Upgrade
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+- name: Install Initial Packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ packages }}"
+
+- name: Clean Up
+  apt:
+    autoclean: yes
+    autoremove: yes
+
+
