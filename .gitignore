@@ -6,3 +6,6 @@ os-images/
 
 # Ignore swap files
 *.swp
+
+# Ignore vars.yaml file 
+vars.yaml

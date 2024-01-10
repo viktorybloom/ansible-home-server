@@ -1,5 +1,9 @@
 # Home Server Initialization Playbook
 
+### Set target environment variables
+Edit `vars.yaml` to suit your target environment. 
+
+
 ### Set Ansible Vault
 
 Execute `./vault_setup.sh` to start the initial vault setup:
