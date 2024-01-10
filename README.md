@@ -1,4 +1,4 @@
-# Home Server Initialization Playbook
+# (RPi 4b) Home Server Initialization Playbook
 
 ### Set target environment variables
 Edit `vars.yaml` to suit your target environment. 
