@@ -16,13 +16,16 @@ sd_card_device="/dev/$selected_drive"
 echo "Selected drive: $sd_card_device"
 
 # Make SD Card Bootable with os ISO
-sudo dd bs=4M if="${os_image}" of=${sd_card_device} conv=fsync status=progress
+sudo dd bs=4M if=${os_image} of=${sd_card_device} conv=fsync status=progress
+
+# Create mounting 
+sudo mkdir /mnt/${target_name}
 
 # Mount the boot partition
-sudo mount ${sd_card_device}"1" /mnt   # Assuming boot partition is the first partition
+sudo mount ${sd_card_device}"1" /mnt/${target_name}   # Assuming boot partition is the first partition
 
 # Enable SSH on Raspberry Pi
-sudo touch /mnt/ssh
+sudo touch /mnt/${target_name}/ssh
 
 # Edit netplan to enable eth0 wired connection on RPI with ubuntu server iso. 
 echo -e "
@@ -34,7 +37,7 @@ echo -e "
           use-dns: false
         nameservers:
           addresses: [127.0.0.1, 9.9.9.9] # Required for docker pihole dns service
-        optional: true" | sudo tee /mnt/netplan
+        optional: true" | sudo tee /mnt/${target_name}/netplan
 	
 # Edit user-data to setup initial credentials
 echo -e "#cloud-config\n\n\
@@ -58,4 +61,4 @@ timezone: Australia/Brisbane\n\
 runcmd:\n\
   - sed -i 's/^s*REGDOMAIN=S*/REGDOMAIN=AU/' /etc/default/crda || true\n\
   - localectl set-x11-keymap \"us\" pc105\n\
-  - setupcon -k --force || true" | sudo tee /mnt/user-data
+  - setupcon -k --force || true" | sudo tee /mnt/${target_name}/user-data
