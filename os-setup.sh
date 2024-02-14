@@ -8,11 +8,12 @@ os_image=$(grep "os_image:" "./vars.yaml" | awk -F"'" '{print $2}')
 
 lsblk
 read -p "Please choose a drive (e.g., sdb, sdc, etc.): " selected_drive
-if [[ ! $(ls /dev/sd* | grep -E "/dev/sd[b-z]") =~ /dev/$selected_drive ]]; then
+if [[ ! $(ls /dev/sd* | grep -E "/dev/sd[a-z]") =~ /dev/$selected_drive ]]; then
   echo "Invalid drive selection. Exiting..."
   exit 1
 fi
-sd_card_device="/dev/$selected_drive"  echo "Selected drive: $sd_card_device"
+sd_card_device="/dev/$selected_drive"  
+echo "Selected drive: $sd_card_device"
 
 # Make SD Card Bootable with os ISO
 sudo dd bs=4M if="${os_image}" of=${sd_card_device} conv=fsync status=progress
