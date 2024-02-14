@@ -1,14 +1,21 @@
 #!/bin/bash
 
 # Variables
-sd_card_device=$(ls /dev/sd* | grep -E "/dev/sd[b-z]" | head -n 1) # from b-z since sdcard reader itself takes sd'a'
 vault_file="./vault/secret.txt"
 target_password=$(echo "$(cat $vault_file)" | mkpasswd -m sha-512 -s)
 target_name=$(grep "target_name:" "./vars.yaml" | awk -F"'" '{print $2}')
 os_image=$(grep "os_image:" "./vars.yaml" | awk -F"'" '{print $2}')
 
+lsblk
+read -p "Please choose a drive (e.g., sdb, sdc, etc.): " selected_drive
+if [[ ! $(ls /dev/sd* | grep -E "/dev/sd[b-z]") =~ /dev/$selected_drive ]]; then
+  echo "Invalid drive selection. Exiting..."
+  exit 1
+fi
+sd_card_device="/dev/$selected_drive"  echo "Selected drive: $sd_card_device"
+
 # Make SD Card Bootable with os ISO
-sudo dd bs=4M if="${os_image%.xz}" of=${sd_card_device} conv=fsync status=progress
+sudo dd bs=4M if="${os_image}" of=${sd_card_device} conv=fsync status=progress
 
 # Mount the boot partition
 sudo mount ${sd_card_device}"1" /mnt   # Assuming boot partition is the first partition
