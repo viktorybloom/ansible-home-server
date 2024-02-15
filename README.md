@@ -26,3 +26,4 @@ Once os is loaded execute `./setup.sh` to start the playbook.
 - xz-utils
 - util-linux
 - dosfstools
+- sshpass
