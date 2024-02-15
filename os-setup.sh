@@ -15,19 +15,31 @@ fi
 sd_card_device="/dev/$selected_drive"  
 echo "Selected drive: $sd_card_device"
 
-# Make SD Card Bootable with os ISO
-sudo dd bs=4M if=${os_image} of=${sd_card_device} conv=fsync status=progress
+# Unmount any existing partitions on the drive
+sudo umount ${sd_card_device}* 2>/dev/null || true
 
-# Create mounting 
-sudo mkdir /mnt/${target_name}
+# Check for and terminate processes using the drive
+sudo fuser -k ${sd_card_device}
+
+# Wipe the entire drive
+sudo wipefs --all ${sd_card_device}
+
+# Format the selected drive as FAT32
+sudo mkfs.fat -F32 ${sd_card_device}
+
+# Extract .xz iso and Make SD Card Bootable with OS ISO
+sudo xz -d < ${os_image} | sudo dd bs=4M of=${sd_card_device} conv=fsync status=progress
+
+# Create mounting directory if it doesn't exist
+sudo mkdir -p /mnt/${target_name}
 
 # Mount the boot partition
-sudo mount ${sd_card_device}"1" /mnt/${target_name}   # Assuming boot partition is the first partition
+sudo mount ${sd_card_device}1 /mnt/${target_name}
 
 # Enable SSH on Raspberry Pi
 sudo touch /mnt/${target_name}/ssh
 
-# Edit netplan to enable eth0 wired connection on RPI with ubuntu server iso. 
+# Edit netplan to enable eth0 wired connection on RPI with Ubuntu Server ISO.
 echo -e "
     version: 2
     ethernets:
@@ -39,9 +51,9 @@ echo -e "
           addresses: [127.0.0.1, 9.9.9.9] # Required for docker pihole dns service
         optional: true" | sudo tee /mnt/${target_name}/netplan
 	
-# Edit user-data to setup initial credentials
+# Edit user-data to set up initial credentials
 echo -e "#cloud-config\n\n\
-hostname: ${target_name}n\
+hostname: ${target_name}\n\
 manage_etc_hosts: true\n\
 packages:\n\
   - avahi-daemon\n\
@@ -62,3 +74,4 @@ runcmd:\n\
   - sed -i 's/^s*REGDOMAIN=S*/REGDOMAIN=AU/' /etc/default/crda || true\n\
   - localectl set-x11-keymap \"us\" pc105\n\
   - setupcon -k --force || true" | sudo tee /mnt/${target_name}/user-data
+
