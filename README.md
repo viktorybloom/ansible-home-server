@@ -20,3 +20,9 @@ Once done load the sd card into the RPi to continue setup.
 
 ### Initialise Ansible Playbook to target device
 Once os is loaded execute `./setup.sh` to start the playbook.
+
+### Package requirements
+- whois
+- xz-utils
+- util-linux
+- dosfstools
