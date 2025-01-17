@@ -41,6 +41,7 @@ sudo touch /mnt/${target_name}/ssh
 
 # Edit netplan to enable eth0 wired connection on RPI with Ubuntu Server ISO.
 echo -e "
+    network:
     version: 2
     ethernets:
       eth0:
@@ -49,7 +50,10 @@ echo -e "
           use-dns: false
         nameservers:
           addresses: [127.0.0.1, 9.9.9.9] # Required for docker pihole dns service
-        optional: true" | sudo tee /mnt/${target_name}/netplan
+        optional: true
+        routes:
+          - to: 10.9.8.0/24
+            via: 192.168.1.100" | sudo tee /mnt/${target_name}/netplan
 	
 # Edit user-data to set up initial credentials
 echo -e "#cloud-config\n\n\
